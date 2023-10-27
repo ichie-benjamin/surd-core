@@ -3,6 +3,7 @@
 namespace Surd\SurdCore\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -19,9 +20,9 @@ class SurdCoreController extends Controller
         $base = base64_decode('aHR0cHM6Ly9jaGVjay5zdXJkb25saW5lLmNvbS9hcGkvdjEvY2hlY2stZG9tYWlu');
 
         if (self::is_local()) {
-            return response()->json([
-                'active' => 1,
-            ]);
+            $data['active'] = 1;
+            $data['message'] = null;
+            $this->commitResponse($data);
         } else {
             $remove = array("http://","https://","www.");
             $url = str_replace($remove, "", url('/'));
@@ -64,15 +65,26 @@ class SurdCoreController extends Controller
         if($response['active'] > 1){
             session()->put('failure',$response['message']);
             session()->put('error',$response['message']);
+            session()->put('has_key_error',true);
+        }else{
+            if(session()->has('has_key_error')){
+                session()->forget(['has_key_error','failure','error']);
+            }
         }
-        DB::table(base64_decode('c29mdF9jcmVkZW50aWFscw=='))->updateOrInsert([
-            'key' => base64_decode('c3VyZF9jb3Jl'),
-            'value' => $response['active']
-        ]);
-        DB::table(base64_decode('c29mdF9jcmVkZW50aWFscw=='))->updateOrInsert([
-            'key' => base64_decode('c3VyZF9jb3JlX3ZhbA=='),
-            'value' => $response['message']
-        ]);
+
+        try {
+            DB::table(base64_decode('c29mdF9jcmVkZW50aWFscw=='))->updateOrInsert([
+                'key' => base64_decode('c3VyZF9jb3Jl'),
+                'value' => $response['active']
+            ]);
+            DB::table(base64_decode('c29mdF9jcmVkZW50aWFscw=='))->updateOrInsert([
+                'key' => base64_decode('c3VyZF9jb3JlX3ZhbA=='),
+                'value' => $response['message']
+            ]);
+        }catch (Exception $ex){
+
+        }
+
     }
 
     public function dDB(Request $request){
