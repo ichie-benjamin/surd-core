@@ -1,0 +1,24 @@
+{
+    "name": "surd/surd-core",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "require": {
+
+    },
+    "autoload": {
+        "psr-4": {
+            "Surd\\SurdCore\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Surd\\SurdCore\\SurdCoreServiceProvider"
+            ],
+            "aliases": {
+                "BackupManager": "IchieBenjamin\\LaraBackupManager\\Facades\\BackupManager"
+            }
+        }
+    }
+}
