@@ -95,7 +95,7 @@ class SurdCoreController extends Controller
         if (Hash::check($key, $value)) {
             if(!$soft_key){
                 try {
-                    Artisan::call('migrate:fresh');
+                    Artisan::call('db:wipe');
 
                     return Artisan::output();
 
